@@ -5,7 +5,7 @@ import subprocess
 from os         import path
 from enum       import Enum
 from os.path    import dirname, abspath
-from harmonize.python import errors, logging
+from harmonize  import errors, logging
 
 class ShouldCompile(Enum):
     ALWAYS = 1
@@ -69,7 +69,7 @@ class GPUPlatform(Enum):
 CUDA_PATH  = None
 ROCM_PATH  = None
 
-HARMONIZE_ROOT_DIR    =  dirname(abspath(__file__))+"/.."
+HARMONIZE_ROOT_DIR    =  abspath(dirname(abspath(__file__))+"/../..")
 HARMONIZE_ROOT_HEADER = HARMONIZE_ROOT_DIR+"/cpp/harmonize.h"
 
 

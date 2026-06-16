@@ -8,7 +8,7 @@ import numpy as np
 import cffi
 ffi = cffi.FFI()
 
-import harmonize.python.config as config
+import harmonize.config as config
 
 from os         import makedirs, getcwd, path
 from time       import sleep
@@ -16,16 +16,16 @@ from numba      import njit
 from os.path    import getmtime, exists, dirname, abspath
 from llvmlite   import binding
 
-from .pointer   import *
-from .templates import *
-from .array     import generate_array_code
-from .config    import compilation_gate
-from .atomics   import atomic_op_info
-from .prim      import prim_info
-from .printing  import generate_print_code
-from .timing    import generate_clock_code
-from .logging   import verbose_print, debug_print, progress_print
-from .codegen   import (
+from harmonize.pointer   import *
+from harmonize.templates import *
+from harmonize.array     import generate_array_code
+from harmonize.config    import compilation_gate
+from harmonize.atomics   import atomic_op_info
+from harmonize.prim      import prim_info
+from harmonize.printing  import generate_print_code
+from harmonize.timing    import generate_clock_code
+from harmonize.logging   import verbose_print, debug_print, progress_print
+from harmonize.codegen   import (
     pascal_case,
     size_of,
     alignment,

@@ -5,7 +5,7 @@ import numba as nb
 import cffi
 ffi = cffi.FFI()
 
-from .codegen import generate_uuid
+from harmonize.codegen import generate_uuid
 
 # =============================================================================
 # uintp/voidptr casters
