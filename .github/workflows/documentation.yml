@@ -25,19 +25,19 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Generate Doxygen Documentation
         uses: mattnotmitt/doxygen-action@v1.12
         with:
           doxyfile-path: ${{ env.DOXYFILE_PATH }}
           working-directory: ${{ env.DOXYGEN_WORKING_DIRECTORY }}
       - name: Upload Generated XML
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: 01A.DoxygenXML
           path: GeneratedDocumentation/xml
       - name: Upload Generated HTML
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: 01B.RawDoxygenHTML
           path: GeneratedDocumentation/html
@@ -56,7 +56,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup a Workspace for Sphinx to Operate Within
         run: mkdir -p ${{ env.BUILDDIR }}/SphinxWorkspace
       - name: Copy in Configuration Files for Sphinx
@@ -67,7 +67,7 @@ jobs:
       #  # As we have switched to using `sphinx-autodoc2`, it is no longer necessary to install the package.
       #   run: ${{ env.SPHINX_PACKAGE_SETUP_COMMAND }}
       - name: Download Doxygen XML
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: 01A.DoxygenXML
           path: ${{ env.BUILDDIR }}/SphinxWorkspace/xml/
@@ -83,7 +83,7 @@ jobs:
       - name: Run Sphinx JSON Builder
         run: ${{ env.SPHINXBUILD }} -M json "${{ env.BUILDDIR }}/SphinxWorkspace" "${{ env.BUILDDIR }}"
       - name: Upload Generated JSON
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: 02A.SphinxJSON
           path: ${{ env.BUILDDIR }}/json
@@ -92,7 +92,7 @@ jobs:
       # - name: Run Sphinx HTML Builder
       #   run: ${{ env.SPHINXBUILD }} -M html "${{ env.BUILDDIR }}/SphinxWorkspace" "${{ env.BUILDDIR }}"
       # - name: Upload Generated HTML
-      #   uses: actions/upload-artifact@v4
+      #   uses: actions/upload-artifact@v7
       #   with:
       #     name: 02B.SphinxHTML
       #     path: ${{ env.BUILDDIR }}/html
@@ -109,7 +109,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: true
       - name: Setup a Workspace for Fumadocs to Operate Within
@@ -127,7 +127,7 @@ jobs:
       # This section contains commands to orchestrate the moving and organization of files into Fumadocs.
       # 
       - name: Download Sphinx JSON
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: 02A.SphinxJSON
           path: SphinxJSON/
@@ -155,7 +155,7 @@ jobs:
       # Upload Results
       # 
       - name: Upload Generated HTML
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: 03A.FumadocsHTML
           path: ${{ env.BUILDDIR }}/out
