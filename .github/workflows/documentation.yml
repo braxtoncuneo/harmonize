@@ -24,14 +24,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: tree
       - name: Checkout Repository
         uses: actions/checkout@v6
+      - run: tree
       - name: Generate Doxygen Documentation
         uses: mattnotmitt/doxygen-action@v1.12
         with:
           doxyfile-path: ${{ env.DOXYFILE_PATH }}
           working-directory: ${{ env.DOXYGEN_WORKING_DIRECTORY }}
+      - run: tree
       - name: Upload Generated XML
         uses: actions/upload-artifact@v7
         with:
