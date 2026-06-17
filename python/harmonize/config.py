@@ -11,11 +11,15 @@ class ShouldCompile(Enum):
     ALWAYS = 1
     NEVER  = 2
 
-
+#: [default False] If `True`, compiles runtime code with debugging symbols.
 DEBUG   = False
+#: [default False] If `True`, log messages narrating the build processes being performed.
 VERBOSE = False
+#: [default False] If `True`, enables log messages included for internal debugging by developers.
 INTERNAL_DEBUG = False
+#: [default True] IF `True`, enables log messages providing further explanation of some errors. 
 ERROR_PRINT = True
+#: [default True] If `True`, uses ANSI escapes to color-code log messages.
 COLOR_LOG = True
 
 NONE_AVAILABLE = True
