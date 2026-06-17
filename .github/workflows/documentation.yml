@@ -9,7 +9,7 @@ env:
 
   DOXYFILE_PATH: "docs/Doxygen/Doxyfile"
   DOXYGEN_WORKING_DIRECTORY: "./"
-  DOXYGEN_SOURCE_DIR: "harmonize/cpp"
+  DOXYGEN_SOURCE_DIR: "cpp"
   # TODO: Add configuration paramater to specify the folder path to document.
 
   SPHINXOPTS: ""
