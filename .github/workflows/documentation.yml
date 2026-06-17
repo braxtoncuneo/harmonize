@@ -24,6 +24,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - run: tree
       - name: Checkout Repository
         uses: actions/checkout@v6
       - name: Generate Doxygen Documentation
