@@ -12,8 +12,17 @@ class ShouldCompile(Enum):
     NEVER  = 2
 
 #: [default False] If `True`, compiles runtime code with debugging symbols.
+"""
+Test A
+"""
 DEBUG   = False
+"""
+Test B
+"""
 #: [default False] If `True`, log messages narrating the build processes being performed.
+"""
+Test C
+"""
 VERBOSE = False
 #: [default False] If `True`, enables log messages included for internal debugging by developers.
 INTERNAL_DEBUG = False
