@@ -133,6 +133,7 @@ jobs:
           path: SphinxJSON/
 
       # Organize C++ API Folder Index Files
+      - run: tree
       - run: mv SphinxJSON/cppAPI/classlist.fjson SphinxJSON/cppAPI/class/index.fjson
       - run: mv SphinxJSON/cppAPI/filelist.fjson SphinxJSON/cppAPI/file/index.fjson
       - run: mv SphinxJSON/cppAPI/structlist.fjson SphinxJSON/cppAPI/struct/index.fjson
