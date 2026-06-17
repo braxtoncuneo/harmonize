@@ -1,0 +1,3 @@
+[submodule "docs/harmonize-documentation-fumadocs"]
+	path = docs/Fumadocs
+	url = git@github.com:braxtoncuneo/harmonize-documentation-fumadocs.git
