@@ -1,0 +1,17 @@
+{
+    "title": "Harmonize",
+    "description": "",
+    "root": true,
+    "pages": [
+        "---Getting Started---",
+        "./(gettingStarted)/index",
+        "...(gettingStarted)",
+        
+        "---Full API Reference---",
+        "pythonAPI",
+        "cppAPI",
+        "---More from Harmonize---",
+        "aboutTheProject",
+        "..."
+    ]
+}

@@ -1,0 +1,185 @@
+name: "DocChain1"
+description: "Generate modern documentation using Doxygen, Sphinx, Breathe, and Fumadocs"
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  BUILDDIR: "./GeneratedDocumentation"
+
+  DOXYFILE_PATH: "docs/Doxygen/Doxyfile"
+  DOXYGEN_WORKING_DIRECTORY: "./"
+  DOXYGEN_SOURCE_DIR: "harmonize/cpp"
+  # TODO: Add configuration paramater to specify the folder path to document.
+
+  SPHINXOPTS: ""
+  # The Sphinx command to execute upon builds.
+  SPHINXBUILD: sphinx-build
+  SPHINX_PACKAGE_SETUP_COMMAND: ./install.sh
+  # SPHINX_SOURCE_DIR: "harmonize/python"
+  
+
+jobs:
+  _01_generate_doxygen_documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Generate Doxygen Documentation
+        uses: mattnotmitt/doxygen-action@v1.12
+        with:
+          doxyfile-path: ${{ env.DOXYFILE_PATH }}
+          working-directory: ${{ env.DOXYGEN_WORKING_DIRECTORY }}
+      - name: Upload Generated XML
+        uses: actions/upload-artifact@v4
+        with:
+          name: 01A.DoxygenXML
+          path: GeneratedDocumentation/xml
+      - name: Upload Generated HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: 01B.RawDoxygenHTML
+          path: GeneratedDocumentation/html
+
+      # - name: Test - Upload Generated HTML, formatted for GitHub Pages
+      #   uses: actions/upload-pages-artifact@v3
+      #   with:
+      #     path: GeneratedDocumentation/html
+      # # - name: Test Configure GitHub Pages
+      # #   uses: actions/configure-pages@v5
+
+  _02_generate_sphinx_documentation:
+
+    needs: _01_generate_doxygen_documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup a Workspace for Sphinx to Operate Within
+        run: mkdir -p ${{ env.BUILDDIR }}/SphinxWorkspace
+      - name: Copy in Configuration Files for Sphinx
+        run: cp -r docs/Sphinx/* ${{ env.BUILDDIR }}/SphinxWorkspace/
+      # - name: Copy in Source Files for Sphinx
+      #   run: cp -r ${{ env.SPHINX_SOURCE_DIR }}/* ${{ env.BUILDDIR }}/SphinxWorkspace/
+      # - name: Install and Setup Target Package for Sphinx
+      #  # As we have switched to using `sphinx-autodoc2`, it is no longer necessary to install the package.
+      #   run: ${{ env.SPHINX_PACKAGE_SETUP_COMMAND }}
+      - name: Download Doxygen XML
+        uses: actions/download-artifact@v5
+        with:
+          name: 01A.DoxygenXML
+          path: ${{ env.BUILDDIR }}/SphinxWorkspace/xml/
+      - name: Install Sphinx and MyST Parser (To Parse MyST Markdown)
+        run: pip install -U sphinx myst-parser
+      - name: Install the Breathe and Sphinx-Autodoc2 Sphinx Extensions
+        run: pip install -U breathe sphinx-autodoc2
+      # Generation of Python API documentation pages is no longer necessary, as this is now done automatically by `sphinx-autodoc2`.
+      # - name: Autogenerate Sphinx Python API Pages
+      #   run: sphinx-apidoc --implicit-namespaces --separate -o "${{ env.BUILDDIR }}/SphinxWorkspace/pythonAPI" harmonize/
+      - name: Autogenerate Breathe-Sphinx C++ API Pages
+        run: breathe-apidoc -g class,struct,union,file -o ${{ env.BUILDDIR }}/SphinxWorkspace/cppAPI/ ${{ env.BUILDDIR }}/SphinxWorkspace/xml/
+      - name: Run Sphinx JSON Builder
+        run: ${{ env.SPHINXBUILD }} -M json "${{ env.BUILDDIR }}/SphinxWorkspace" "${{ env.BUILDDIR }}"
+      - name: Upload Generated JSON
+        uses: actions/upload-artifact@v4
+        with:
+          name: 02A.SphinxJSON
+          path: ${{ env.BUILDDIR }}/json
+
+      # # Test Actions for GitHub Pages Upload. These should be disabled in production.
+      # - name: Run Sphinx HTML Builder
+      #   run: ${{ env.SPHINXBUILD }} -M html "${{ env.BUILDDIR }}/SphinxWorkspace" "${{ env.BUILDDIR }}"
+      # - name: Upload Generated HTML
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: 02B.SphinxHTML
+      #     path: ${{ env.BUILDDIR }}/html
+      # # Test Deploy
+      # - name: Test - Upload Generated HTML, formatted for GitHub Pages
+      #   uses: actions/upload-pages-artifact@v3
+      #   with:
+      #     path: GeneratedDocumentation/html
+
+  _03_generate_fumadocs_documentation:
+
+    needs: _02_generate_sphinx_documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Setup a Workspace for Fumadocs to Operate Within
+        run: mkdir -p ${{ env.BUILDDIR }}
+      - name: Copy In Fumadocs Source Files
+        run: cp -r docs/Fumadocs/harmonize/* ${{ env.BUILDDIR }}
+      - name: Copy In User-Created Content Files
+        run: cp -r docs/Content/* ${{ env.BUILDDIR }}/content/docs/
+      - name: Inject the Current Repository Name as the Next.js `basepath`
+        run: sed -i 's|basePath[:] ".*"|basePath:"/${{ github.event.repository.name }}"|' '${{ env.BUILDDIR }}/next.config.mjs'
+      - name: Inject the Current Repository Name into the Search Provider Path
+        run: sed -i 's|from[:] ".*"|from:"/${{ github.event.repository.name }}/api/search"|' '${{ env.BUILDDIR }}/src/components/search.tsx'
+        
+      #
+      # This section contains commands to orchestrate the moving and organization of files into Fumadocs.
+      # 
+      - name: Download Sphinx JSON
+        uses: actions/download-artifact@v5
+        with:
+          name: 02A.SphinxJSON
+          path: SphinxJSON/
+
+      # Organize C++ API Folder Index Files
+      - run: mv SphinxJSON/cppAPI/classlist.fjson SphinxJSON/cppAPI/class/index.fjson
+      - run: mv SphinxJSON/cppAPI/filelist.fjson SphinxJSON/cppAPI/file/index.fjson
+      - run: mv SphinxJSON/cppAPI/structlist.fjson SphinxJSON/cppAPI/struct/index.fjson
+      - run: mv SphinxJSON/cppAPI/unionlist.fjson SphinxJSON/cppAPI/union/index.fjson
+
+      - name: Move Python API JSON Files into Fumadocs
+        run: mv SphinxJSON/apidocs/harmonize/* ${{ env.BUILDDIR }}/content/docs/pythonAPI/
+      - name: Move C++ API JSON Files into Fumadocs
+        run: mv SphinxJSON/cppAPI/* ${{ env.BUILDDIR }}/content/docs/cppAPI/
+      
+      #
+      # Build Next.js/Fumadocs Static Site
+      # 
+      - name: Prepare Environment Dependencies
+        run: cd ${{ env.BUILDDIR }} && npm ci
+      - name: Build Next.js/Fumadocs Static Site
+        run: cd ${{ env.BUILDDIR }} && npx --no-install next build
+      
+      # 
+      # Upload Results
+      # 
+      - name: Upload Generated HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: 03A.FumadocsHTML
+          path: ${{ env.BUILDDIR }}/out
+      - name: Uploaded the Generated HTML in a Special Format for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ env.BUILDDIR }}/out
+
+  _04_publish_to_github_pages:
+
+    needs: _03_generate_fumadocs_documentation
+    runs-on: ubuntu-latest
+
+    # Permissions for Test GitHub Pages Deployment
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # End Permissions
+
+    # Deploy and Publish to GitHub Pages
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        id: deployment

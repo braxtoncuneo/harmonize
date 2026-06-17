@@ -1,0 +1,11 @@
+{
+    "title": "About the Project",
+    "icon": "Info",
+    "defaultOpen": false,
+    "pages": [
+        "story",
+        "developers",
+        "sponsors",
+        "contact"
+    ]
+}

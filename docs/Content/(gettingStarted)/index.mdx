@@ -1,0 +1,109 @@
+---
+title: Welcome to Harmonize!
+description: A first introduction to the Harmonize GPU execution framework.
+---
+
+import { HardDriveDownload, Github, FileCode } from 'lucide-react';
+
+
+{/*import { GithubInfo } from 'fumadocs-ui/components/github-info';*/}
+{/*<GithubInfo owner="CEMeNT-PSAAP" repo="harmonize" className="lg:-mx-2" />*/}
+
+Harmonize is an execution framework for GPU that exposes the parallel processing capabilities of GPUs through **asynchronous (async) processing calls**.
+
+It aims to improve program performance while decreating your development burden, especially **when your project requires complex processing tasks**.
+
+In short, Harmonize is desined to help you **parallelize more of your projects without requiring you to be an expert at writing GPU code** (such as [CUDA](https://docs.nvidia.com/cuda/doc/index.html) or [ROCm/HIP](https://www.amd.com/en/products/software/rocm.html)).
+
+It is currently available both as a <ins>headers-only CUDA/HIP C++ library</ins> and as a <ins>Python package</ins>.
+
+## Our Approach
+
+### Why Async?
+
+[Asynchronous (async) programming](https://doc.rust-lang.org/book/ch17-00-async-await.html) represents a **looser contract between program and execution environment.**
+Once a function is called, there is no guarantee of where or when that call is actually evaluated.
+If the call is lazy, then the evaluation may not happen at all.
+
+This looser contract is useful, because it **allows an interface to represent a wide variety of execution strategies** (such as reorganizing processing order to run tasks more efficiently on a GPU) without breaking any promises.
+By representing all program types as different asynchronous runtimes, they can be used interchangeably as long as they fulfill the few promises made by the runtime's interface.
+
+
+### Harmonize Fundamentals
+
+The Harmonize workflow requires a two-step approach to running code:
+
+1. **Define a Program *Specification***
+
+    A programming specification *specifies in advance* a collection of asychronous functions that you'll need to execute within some program runtime. These functions contain and represent the logic that needs to be accomplished on the GPU.
+
+    Program specifications only reference runtime systems abstractly so that execution can later be tuned for greater performance on specific environments.
+
+2. **Use Harmonize to Transform your *Specification* into a Program *Specialization***
+
+    Harmonize contains special C++ Templates (called `"Program Types"`) which automatically convert your Program *Specifications* into specialized versions for the environment you are actually going to run your code on.
+
+    With our framework developers optimizing this conversion process, you'll get to running much [faster](https://blog.melashri.net/posts/i-hate-cuda/) through our streamlined developer experience.
+
+
+<figcaption>Here's what the Harmonize Workflow Looks Like:</figcaption>
+<Mermaid
+chart='
+flowchart LR
+    A("
+    **Program *Specification***
+    <ul style="text-align:left; padding-left:1em;"><li>A collection of asynchronous functions you would like to call</li><li>Refers to runtime systems abstractly</li>
+    
+  </ul>
+    ") -->
+    |"`
+    Program Types
+    **Provided by
+    Harmonize**
+    `"| B("`
+    **Program *Specialization***
+    <ul style="text-align:left; padding-left:1em;"><li>Concretely identifies what and when to execute code for a specific environment.</li>
+    
+  </ul>
+    `")
+'/>
+{/**/}
+
+#### A Note on Program Types
+
+Ideally, with the addition of a program type, transitioning a codebase to this other program could be as little as a one-line refactor:
+
+```
+< using MyProgram = EventProgram<MyProgramSpec>;
+> using MyProgram = AsyncProgram<MyProgramSpec>;
+```
+
+Likewise, as long as the interface between the specification and the program type does not change, program types may be updated without requiring refactors from the application developers.
+
+## Ready to Get Started?
+
+<Cards>
+  <Card
+    href="/docs/installation"
+    title="Install Harmonize"
+    icon={<HardDriveDownload />}
+  >Learn how to Install Harmonize</Card>
+
+  <Card
+    href="https://github.com/CEMeNT-PSAAP/harmonize/tree/main/examples"
+    title="Harmonize Examples"
+    icon={<Github />}
+  >View Harmonize Examples on GitHub</Card>
+  
+  <Card
+    href="/docs/pythonAPI"
+    title="Harmonize Python API"
+    icon={<FileCode />}
+  >Browse the full Python API</Card>
+
+  <Card
+    href="/docs/cppAPI"
+    title="Harmonize C++ API"
+    icon={<FileCode />}
+  >Browse the full C++ API</Card>
+</Cards>

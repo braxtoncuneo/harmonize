@@ -1,0 +1,131 @@
+---
+title: Installation
+description: A guide to getting Harmonize running on your computer.
+---
+
+The Harmonize Framework currently comes in two flavors:
+
+- **A Headers-Only CUDA/HIP C++ library**
+
+- **A Python Package**
+    - We're not on PyPI/pip yet, so you'll have to follow along with these instructions!
+
+We're looking forward to seeing what you build!
+
+
+<Steps>
+
+{/* Begin Step 1 */}
+<Step>
+
+## Install Your GPU Toolkit
+
+Because Harmonize works much closer to low-level GPU hardware than most programs, you'll have to do something you might not be used to: install a toolkit from the manufacture your GPU hardware came from.
+
+Choose the toolkit that corresponds to the manufacturer of your GPU:
+
+<Tabs groupId="gpu" items={["NVIDIA", "AMD"]} persist>
+    <Tab value="NVIDIA">
+    Install NVIDIA's CUDA Toolkit
+
+    [https://docs.nvidia.com/cuda/cuda-quick-start-guide/index.html](https://docs.nvidia.com/cuda/cuda-quick-start-guide/index.html)
+    </Tab>
+
+    <Tab value="AMD">
+    Install Version 6.0.0 of AMD's ROCm Toolkit
+
+    [https://rocm.docs.amd.com/en/latest/](https://rocm.docs.amd.com/en/latest/)
+    </Tab>
+</Tabs>
+
+Also, make sure you have the CUDA runtime (host and device).
+
+<Accordions type="single">
+    <Accordion title="Advanced Users">
+    If you're an advanced user with a particular CUDA/ROCm environment setup, you can skip this step if you already have or can get the following installed:
+
+    ### For C++
+
+    - If you're using CUDA:
+        - A CUDA compiler (e.g. `nvcc`)
+        - The CUDA runtime (host and device)
+    - If you're using ROCm:
+        - a HIP compiler (e.g. `hipcc`)
+        - the ROCM runtime (host and device)
+
+    ### For Python
+
+    - If you're using CUDA:
+        - You do need the CUDA Toolkit with `nvcc`
+    - If you're using ROCm:
+        - You do need the ROCm 6.0.0 Toolkit with its versions of `hipcc`, `clang-offload-bundler`, `llvm-link`, and `llvm-as`
+        - HIP runtime (host and device)
+
+    </Accordion>
+</Accordions>
+
+</Step>
+
+{/* Begin Step 2 */}
+<Step>
+
+## Dependencies
+
+### C++ Dependencies
+
+🎉 Nothing else is needed at the moment!
+
+### Python Dependencies
+
+Python installations of Harmonize require some packages on PyPI that can be installed with the following command:
+<Tabs groupId="terminal" items={["Terminal/Command Prompt"]}>
+    <Tab value="Terminal/Command Prompt">
+    pip install numpy llvmlite
+    </Tab>
+</Tabs>
+
+Python Installations also need the appropriate version of Numba based on your GPU Manufacture:
+
+<Tabs groupId="gpu" items={["NVIDIA", "AMD"]} persist>
+    <Tab value="NVIDIA">
+    You'll need the [regular version of Numba](https://github.com/numba/numba)
+
+    `pip install numba`
+    </Tab>
+
+    <Tab value="AMD">
+    You'll need the [AMD Fork of Numba](https://github.com/ROCm/numba-hip)
+
+    `pip config set global.extra-index-url https://test.pypi.org/simple`
+
+    `pip install "numba-hip[rocm-6-1-2,test] @ git+https://github.com/ROCm/numba-hip.git`
+    </Tab>
+</Tabs>
+
+</Step>
+
+{/* Begin Step 3 */}
+<Step>
+## Download Harmonize
+
+Download the latest release of the [Harmonize Source Code](https://github.com/CEMeNT-PSAAP/harmonize/releases/latest) from GitHub.
+</Step>
+
+</Steps>
+
+
+{/*<Tabs groupId="language" items={["C++", "Python"]} persist>
+    <Tab value="C++">
+    </Tab>
+
+    <Tab value="Python">
+    </Tab>
+</Tabs>
+
+<Tabs groupId="gpu" items={["NVIDIA", "AMD"]} persist>
+    <Tab value="NVIDIA">
+    </Tab>
+
+    <Tab value="AMD">
+    </Tab>
+</Tabs>*/}
