@@ -1322,6 +1322,21 @@ class RuntimeSpec():
 
     @staticmethod
     def load_specs():
+        load_wrapper_template="""
+def load_wrapper_{id} (field,vp):
+    pass
+
+@numba.extending.overload(load_wrapper_{id})
+def load_wrapper_{id}_obj_overload (field,vp):
+    if isinstance(field,numba.types.Array):
+        def impl(field,vp):
+            load_state(field.ctypes.data,vp)
+        return impl
+    else:
+        def impl(field,vp):
+            load_state(field,vp)
+        return impl
+"""
 
         so_path  = f"{RuntimeSpec.cache_path}harmonize.so"
         abs_so_path = abspath(so_path)
@@ -1359,7 +1374,9 @@ class RuntimeSpec():
                         id = generate_uuid()
                         exec(f"def store_wrapper_{id}(vp,field):\n    vptr = into_voidptr(field)\n    store_state(vp,vptr)",globals()|locals(),locals())
                         exec(f"def store_pointer_wrapper_{id}(vp,field):\n    vptr = into_voidptr(field)\n    store_p_state(vp,vptr)",globals()|locals(),locals())
-                        exec(f"def load_wrapper_{id} (field,vp):\n    load_state(field.ctypes.data,vp)",globals()|locals(),locals())
+                        #exec(f"def load_wrapper_{id} (field,vp):\n    load_state(field.ctypes.data,vp)",globals()|locals(),locals())
+                        #exec(f"def load_wrapper_{id} (field,vp):\n    load_state(field,vp)",globals()|locals(),locals())
+                        exec(load_wrapper_template.format(id=id),globals()|locals(),locals())
                         store_state = eval(f"numba.njit()(store_wrapper_{id})")
                         store_p_state = eval(f"numba.njit()(store_pointer_wrapper_{id})")
                         load_state  = eval(f"numba.njit()(load_wrapper_{id})")
