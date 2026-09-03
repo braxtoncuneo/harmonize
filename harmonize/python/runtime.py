@@ -1337,6 +1337,21 @@ def load_wrapper_{id}_obj_overload (field,vp):
             load_state(field,vp)
         return impl
 """
+        store_wrapper_template="""
+def store_wrapper_{id} (vp,field):
+    pass
+
+@numba.extending.overload(store_wrapper_{id})
+def store_wrapper_{id}_obj_overload (vp,field):
+    if isinstance(field,numba.types.Array):
+        def impl(vp,field):
+            store_state(vp,field.ctypes.data)
+        return impl
+    else:
+        def impl(vp,field):
+            store_state(vp,field)
+        return impl
+"""
 
         so_path  = f"{RuntimeSpec.cache_path}harmonize.so"
         abs_so_path = abspath(so_path)
@@ -1372,10 +1387,8 @@ def load_wrapper_{id}_obj_overload (field,vp):
                     load_state    = ext_fn(f"{load_name}_{suffix}",    sig(void, field.ext_kind, vp))
                     if field.is_array :
                         id = generate_uuid()
-                        exec(f"def store_wrapper_{id}(vp,field):\n    vptr = into_voidptr(field)\n    store_state(vp,vptr)",globals()|locals(),locals())
                         exec(f"def store_pointer_wrapper_{id}(vp,field):\n    vptr = into_voidptr(field)\n    store_p_state(vp,vptr)",globals()|locals(),locals())
-                        #exec(f"def load_wrapper_{id} (field,vp):\n    load_state(field.ctypes.data,vp)",globals()|locals(),locals())
-                        #exec(f"def load_wrapper_{id} (field,vp):\n    load_state(field,vp)",globals()|locals(),locals())
+                        exec(store_wrapper_template.format(id=id),globals()|locals(),locals())
                         exec(load_wrapper_template.format(id=id),globals()|locals(),locals())
                         store_state = eval(f"numba.njit()(store_wrapper_{id})")
                         store_p_state = eval(f"numba.njit()(store_pointer_wrapper_{id})")
