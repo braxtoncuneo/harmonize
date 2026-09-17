@@ -1,7 +1,7 @@
 # Use this on lassen
 # CC_PATH	= /usr/tce/packages/cuda/cuda-11.5.0/bin/nvcc
 
-TARGET          = CUDA
+TARGET          = HIP
 HARMONIZE_PATH  = ../../../harmonize/cpp/harmonize.h
 
 ifeq ($(TARGET), CUDA)
