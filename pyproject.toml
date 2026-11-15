@@ -36,8 +36,21 @@ dependencies = [
     "numba>=0.58.0",
     "numpy",
     "colorama",
-    "black",
+    "cffi",
 ]
+
+# GPU backends.
+#
+# The CUDA extras install Numba's CUDA backend for one CUDA major version.
+# Harmonize also needs that version's nvcc (from the system, a module, or
+# conda's cuda-nvcc).
+#
+# AMD's numba-hip is installed separately for a specific
+# ROCm release; `python -m harmonize check` prints the command.
+[project.optional-dependencies]
+cuda12 = ["numba-cuda[cu12]>=0.30"]
+cuda13 = ["numba-cuda[cu13]>=0.30"]
+dev = ["black"]
 
 [project.urls]
 Repository = "https://github.com/CEMeNT-PSAAP/harmonize"
