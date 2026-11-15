@@ -70,4 +70,54 @@ Python bindings require:
     - [the AMD fork of `numba`](https://github.com/ROCm/numba-hip)
 
 
+## Installation
+
+For NVIDIA GPUs, install the extra matching your CUDA toolkit's major version:
+
+```sh
+pip install "harmonize[cuda13]"   # or harmonize[cuda12]
+```
+
+That version's `nvcc` must also be available from the system, an environment
+module (`module load cuda`), or conda (`conda install -c nvidia cuda-nvcc`).
+
+For AMD GPUs, install ROCm and the corresponding version of `numba-hip` for
+your ROCm release (here, ROCm 6.4.0):
+
+```sh
+pip install --extra-index-url https://test.pypi.org/simple \
+    "numba-hip[rocm-6-4-0] @ git+https://github.com/ROCm/numba-hip.git"
+pip install harmonize
+```
+
+
+## Checking your setup
+
+```sh
+python -m harmonize info    # detected platform, toolchain, and devices
+python -m harmonize check   # problems that would stop GPU builds; exits non-zero if any
+```
+
+`check` reports, for example, a missing `nvcc`, a CUDA toolkit newer than the
+driver, a toolkit too old to target the installed GPU, or Numba's NVVM emitting
+PTX newer than `nvcc` can assemble (pip's CUDA packages can be newer than the
+`nvcc` on `PATH`; `check` compiles a small function and assembles it to test this).
+Include the output of `info` when reporting problems.
+
+
+## Selecting a platform
+
+By default, Harmonize uses ROCm when `numba-hip` is installed and CUDA
+otherwise. To explicitly require a platform, set `HARMONIZE_PLATFORM` to
+`cuda` or `rocm`:
+
+```sh
+HARMONIZE_PLATFORM=cuda python my_program.py
+```
+
+Toolkit locations can be set with `harmonize.config.set_cuda_path()` and
+`harmonize.config.set_rocm_path()`, otherwise `nvcc` and `hipcc` are found
+on `PATH`.
+
+
 
