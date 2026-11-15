@@ -230,6 +230,8 @@ class RuntimeSpec():
 
         #super(RuntimeSpec,self).__init__(name='Runtime')
 
+        config.require_platform()
+
         if gpu_platform == None:
             platform_name = None
             if   config.CUDA_AVAILABLE:

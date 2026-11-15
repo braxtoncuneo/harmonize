@@ -1,8 +1,9 @@
 import numba
+import shutil
 import subprocess
 
 
-from os         import path
+from os         import environ, path
 from enum       import Enum
 from os.path    import dirname, abspath
 from harmonize.python import errors, logging
@@ -24,29 +25,58 @@ CUDA_AVAILABLE = None
 SHOULD_COMPILE = None
 
 
-try:
-    import numba.hip as hip
-    ROCM_AVAILABLE = True
-    NONE_AVAILABLE = False
-    logging.verbose_print(f"ROCM_PLATFORM detected. Proceeding under ROCM.")
-except ImportError:
+# The GPU platform is chosen once, at import. Set HARMONIZE_PLATFORM to "cuda"
+# or "rocm" to require a platform; the default, "auto", prefers ROCm when its
+# Numba backend is installed and falls back to CUDA.
+PLATFORM_ENV_VAR = "HARMONIZE_PLATFORM"
+PLATFORM_CHOICES = ("auto", "cuda", "rocm")
+PLATFORM_REQUEST = environ.get(PLATFORM_ENV_VAR, "auto").strip().lower() or "auto"
+if PLATFORM_REQUEST not in PLATFORM_CHOICES:
+    raise ValueError(
+        f"{PLATFORM_ENV_VAR}={PLATFORM_REQUEST!r} is not one of {PLATFORM_CHOICES}."
+    )
+
+# Why each Numba GPU backend could not be imported, for diagnostics
+PLATFORM_IMPORT_ERRORS = {}
+
+
+if PLATFORM_REQUEST in ("auto", "rocm"):
+    try:
+        import numba.hip as hip
+        ROCM_AVAILABLE = True
+        NONE_AVAILABLE = False
+        logging.verbose_print(f"ROCM_PLATFORM detected. Proceeding under ROCM.")
+    except ImportError as error:
+        ROCM_AVAILABLE = False
+        PLATFORM_IMPORT_ERRORS["rocm"] = str(error)
+else:
     ROCM_AVAILABLE = False
 
 
 # The HIP version of Numba "has" a cuda module,
 # but doesn't support the things normal Numba does
-if not ROCM_AVAILABLE:
+if not ROCM_AVAILABLE and PLATFORM_REQUEST in ("auto", "cuda"):
     try :
         import numba.cuda as cuda
         CUDA_AVAILABLE = True
         NONE_AVAILABLE = False
         logging.verbose_print(f"CUDA_PLATFORM detected. Proceeding under CUDA.")
-    except ImportError:
+    except ImportError as error:
         CUDA_AVAILABLE = False
+        PLATFORM_IMPORT_ERRORS["cuda"] = str(error)
+else:
+    CUDA_AVAILABLE = False
 
 
-if NONE_AVAILABLE:
-    raise errors.no_platforms()
+def require_platform():
+    """Raise a descriptive error if no GPU platform was selected at import.
+
+    This is deferred to the point where GPU code is built, so harmonize can be
+    imported (for example by `python -m harmonize check`) on machines without
+    a usable GPU backend.
+    """
+    if NONE_AVAILABLE:
+        errors.no_platforms(PLATFORM_REQUEST, PLATFORM_IMPORT_ERRORS)
 
 
 def set_debug(debug):
@@ -130,9 +160,9 @@ def check_rocm_path(quiet=False):
 
 
 def try_autoset_rocm_path():
-    hipcc_path_cmd = "which hipcc"
-    result = subprocess.run(hipcc_path_cmd.split(),shell=False,check=True,stdout=subprocess.PIPE)
-    path = result.stdout.decode('utf-8')[:-1]
+    path = shutil.which("hipcc")
+    if path is None:
+        return
 
     tail = "/bin/hipcc"
     if not path.endswith(tail):
