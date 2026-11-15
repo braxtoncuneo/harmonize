@@ -362,7 +362,7 @@ util::host::auto_throw(adapt::GPUrtMemcpy(
     host_ptr,
     dev_ptr,
     byte_count,
-    adapt::GPUrtMemcpyHostToDevice
+    adapt::GPUrtMemcpyDeviceToHost
 ));
 }}
 """
