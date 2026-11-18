@@ -21,7 +21,7 @@ maintainers = [
 
 description = "Harmonize, an async GPU scheduler"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {file = "LICENSE"}
 keywords = ["HPC", "GPU"]
 classifiers = [
