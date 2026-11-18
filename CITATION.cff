@@ -25,7 +25,7 @@ identifiers:
   - type: doi
     value: 10.1145/3626957
     description: Divergence Reduction in Monte Carlo Neutron Transport with On-GPU Asynchronous Scheduling
-repository-code: 'https://github.com/CEMeNT-PSAAP/harmonize'
+repository-code: 'https://github.com/harmonize-software/harmonize'
 abstract: >-
   An a-synchronous GPU scheduler for deceasing thread divergence on GPU
 keywords:

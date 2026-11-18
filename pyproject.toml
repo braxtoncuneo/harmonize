@@ -56,8 +56,9 @@ cuda13 = ["numba-cuda[cu13]>=0.30"]
 dev = ["black"]
 
 [project.urls]
-Repository = "https://github.com/CEMeNT-PSAAP/harmonize"
-Issues = "https://github.com/CEMeNT-PSAAP/harmonize/issues"
+Documentation = "https://harmonize-software.github.io/harmonize/"
+Repository = "https://github.com/harmonize-software/harmonize"
+Issues = "https://github.com/harmonize-software/harmonize/issues"
 
 
 [tool.hatch.build.targets.wheel]
