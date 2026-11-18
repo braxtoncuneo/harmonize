@@ -84,7 +84,7 @@ struct MyProgramSpec {
 
 
 		// Return whether or not the ID iterator has any IDs left
-		return !prog.device.source_id_iter->sync_done();
+		return !prog.device.source_id_iter->done();
 
 	}
 
@@ -98,7 +98,7 @@ using ProgType = AsyncProgram <MyProgramSpec>;
 
 
 
-int main(int argc, char *argv[]){
+int main(int argc, char const* argv[]){
 
 
 	using host::check_error;
