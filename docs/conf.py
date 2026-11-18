@@ -1,6 +1,7 @@
 # Sphinx settings for the Harmonize documentation site.
 #
-# docs/build.sh runs Sphinx.
+# The guides and the Python API are built here; the C++ API is built by Doxygen
+# (docs/doxygen) into the site's cpp/ directory. docs/build.sh runs both.
 #
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
@@ -24,7 +25,7 @@ extensions = [
     "sphinx.ext.viewcode",
 ]
 
-exclude_patterns = ["_build", "README.md"]
+exclude_patterns = ["_build", "README.md", "doxygen"]
 
 # -- Markdown (MyST) -----------------------------------------------------------
 myst_enable_extensions = ["colon_fence", "deflist"]

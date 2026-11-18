@@ -33,6 +33,10 @@ Example programs on GitHub.
 Reference for the `harmonize` Python package.
 :::
 
+:::{grid-item-card} C++ API
+:link: cpp/index.html
+Reference for the headers-only C++ library.
+:::
 ::::
 
 ## Our approach
@@ -104,4 +108,5 @@ installation
 :caption: Reference
 
 python-api
+cpp-api
 ```

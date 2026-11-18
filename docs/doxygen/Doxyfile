@@ -1,0 +1,36 @@
+# Doxygen settings for the C++ API reference, published at cpp/ in the
+# documentation site. Only differences from Doxygen's defaults are listed;
+# `doxygen -x Doxyfile` shows them, and `doxygen -g` writes a full template
+# with every option explained.
+#
+# Run from the repository root by docs/build.sh, which sets DOXYGEN_OUTPUT
+# (the directory that will hold the cpp/ folder), DOXYGEN_WARN_LOG, and
+# HARMONIZE_VERSION.
+
+PROJECT_NAME           = "Harmonize C++ API"
+PROJECT_NUMBER         = $(HARMONIZE_VERSION)
+INPUT                  = harmonize/cpp docs/doxygen/mainpage.md
+USE_MDFILE_AS_MAINPAGE = docs/doxygen/mainpage.md
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h *.hpp *.cuh *.cpp *.cu
+OUTPUT_DIRECTORY       = $(DOXYGEN_OUTPUT)
+STRIP_FROM_PATH        = harmonize/cpp
+FULL_PATH_NAMES        = YES
+
+EXTRACT_ALL            = YES
+EXTRACT_STATIC         = YES
+SOURCE_BROWSER         = YES
+
+GENERATE_LATEX         = NO
+HTML_OUTPUT            = cpp
+
+# doxygen-awesome-css (docs/doxygen/doxygen-awesome, v2.5.0), sidebar-only layout
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
+HTML_COLORSTYLE        = LIGHT
+HTML_EXTRA_STYLESHEET  = docs/doxygen/doxygen-awesome/doxygen-awesome.css \
+                         docs/doxygen/doxygen-awesome/doxygen-awesome-sidebar-only.css
+
+QUIET                  = YES
+WARN_LOGFILE           = $(DOXYGEN_WARN_LOG)
