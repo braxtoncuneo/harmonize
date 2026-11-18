@@ -6,7 +6,9 @@ build-backend = "hatchling.build"
 
 
 [project]
-name = "harmonize"
+# The PyPI name "harmonize" belongs to an unrelated project; the import name is
+# still `harmonize`.
+name = "harmonize-python"
 version = "0.0.1"
 authors = [
   { name="Braxton Cuneo", email="bcuneo@seattleu.edu" },
@@ -55,3 +57,9 @@ dev = ["black"]
 [project.urls]
 Repository = "https://github.com/CEMeNT-PSAAP/harmonize"
 Issues = "https://github.com/CEMeNT-PSAAP/harmonize/issues"
+
+
+[tool.hatch.build.targets.wheel]
+# Hatchling would otherwise look for a package named after the project
+# (harmonize_python). harmonize/cpp holds the C++ headers, used at run time.
+packages = ["harmonize"]
