@@ -4,7 +4,7 @@
 cff-version: 1.2.0
 title: 'harmonize'
 message: >-
-  An a-synchronous GPU scheduler for deceasing thread divergence on GPU
+  An asynchronous GPU scheduler for decreasing thread divergence on GPU
 type: software
 authors:
   - name: >-
@@ -27,7 +27,7 @@ identifiers:
     description: Divergence Reduction in Monte Carlo Neutron Transport with On-GPU Asynchronous Scheduling
 repository-code: 'https://github.com/harmonize-software/harmonize'
 abstract: >-
-  An a-synchronous GPU scheduler for deceasing thread divergence on GPU
+  An asynchronous GPU scheduler for decreasing thread divergence on GPU
 keywords:
   - gpu
   - cuda
