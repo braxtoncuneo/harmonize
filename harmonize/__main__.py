@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from harmonize.python import diagnostics
+from harmonize import diagnostics
 
 
 def main(argv=None):

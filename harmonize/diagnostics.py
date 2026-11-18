@@ -14,7 +14,7 @@ import sys
 import tempfile
 from importlib import metadata
 
-from harmonize.python import config
+from harmonize import config
 
 
 NUMBA_HIP_REPOSITORY = "https://github.com/ROCm/numba-hip.git"

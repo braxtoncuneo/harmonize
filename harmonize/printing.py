@@ -1,7 +1,7 @@
 import numba
 import llvmlite
 
-import harmonize.python.config as config
+import harmonize.config as config
 
 from .templates import print_template
 from .prim import *
