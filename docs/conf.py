@@ -18,6 +18,10 @@ extensions = [
     "myst_parser",
     "sphinx_design",
     "sphinxcontrib.mermaid",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
 ]
 
 exclude_patterns = ["_build", "README.md"]
@@ -25,6 +29,19 @@ exclude_patterns = ["_build", "README.md"]
 # -- Markdown (MyST) -----------------------------------------------------------
 myst_enable_extensions = ["colon_fence", "deflist"]
 myst_heading_anchors = 3
+
+# -- Python API ----------------------------------------------------------------
+# Docstrings use the NumPy style: https://numpydoc.readthedocs.io/en/latest/format.html
+napoleon_google_docstring = False
+napoleon_numpy_docstring = True
+autodoc_member_order = "bysource"
+autodoc_typehints = "description"
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
+    "numba": ("https://numba.readthedocs.io/en/stable", None),
+}
 
 # -- HTML ----------------------------------------------------------------------
 html_theme = "furo"

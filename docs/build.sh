@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # Build the documentation site into docs/_build/html.
 #
-# Sphinx builds the guides (Markdown in docs/).
+# Sphinx builds the guides (Markdown in docs/) and the Python API, read from
+# the installed harmonize package's docstrings.
 #
-# Needs the packages in docs/requirements.txt.
+# Needs Harmonize installed (`pip install -e .`; no GPU needed) and the
+# packages in docs/requirements.txt.
 #
 # Environment:
 #   DOCS_BUILD_DIR  Build directory. Default: docs/_build.

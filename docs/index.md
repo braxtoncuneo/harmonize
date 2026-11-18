@@ -27,6 +27,11 @@ Set up the GPU toolkit and the Python package.
 Example programs on GitHub.
 :::
 
+:::{grid-item-card} Python API
+:link: python-api
+:link-type: doc
+Reference for the `harmonize` Python package.
+:::
 
 ::::
 
@@ -94,3 +99,9 @@ from application developers.
 installation
 ```
 
+```{toctree}
+:hidden:
+:caption: Reference
+
+python-api
+```
