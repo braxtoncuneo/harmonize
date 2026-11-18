@@ -1,11 +1,7 @@
 .vscode/
 
-test_problems/collaz/clz_hrm
-test_problems/collaz/clz_std
-
-test_problems/simple_neutron/neut_std
-test_problems/simple_neutron/neut_hrm
-test_problems/simple_neutron/neut_evt
+# Executables built by the example Makefiles (the others end in .exe)
+examples/cpp/work_in_progress/async_load_demo/demo
 
 *.exe
 *.so
@@ -21,6 +17,8 @@ __ptxcache__/
 __harmonize_cache__/
 
 build/
+dist/
+*.egg-info/
 
 CMakeLists.txt
 
