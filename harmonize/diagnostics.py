@@ -14,7 +14,7 @@ import sys
 import tempfile
 from importlib import metadata
 
-from harmonize.python import config
+from harmonize import config
 
 
 NUMBA_HIP_REPOSITORY = "https://github.com/ROCm/numba-hip.git"
@@ -212,7 +212,7 @@ def collect_rocm_info():
 def collect_info():
     return {
         "harmonize": {
-            "version": package_version("harmonize"),
+            "version": package_version("harmonize-python"),
             "location": config.HARMONIZE_ROOT_DIR,
         },
         "host": {

@@ -3,7 +3,7 @@ import numpy as np
 
 from numba import types
 
-from harmonize.python import config
+from harmonize import config
 from functools import reduce
 import operator
 

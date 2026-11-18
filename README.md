@@ -72,10 +72,13 @@ Python bindings require:
 
 ## Installation
 
+Harmonize is published on PyPI as `harmonize-python` and imported as
+`harmonize`. (The PyPI project named `harmonize` is unrelated.)
+
 For NVIDIA GPUs, install the extra matching your CUDA toolkit's major version:
 
 ```sh
-pip install "harmonize[cuda13]"   # or harmonize[cuda12]
+pip install "harmonize-python[cuda13]"   # or harmonize-python[cuda12]
 ```
 
 That version's `nvcc` must also be available from the system, an environment
@@ -87,8 +90,12 @@ your ROCm release (here, ROCm 6.4.0):
 ```sh
 pip install --extra-index-url https://test.pypi.org/simple \
     "numba-hip[rocm-6-4-0] @ git+https://github.com/ROCm/numba-hip.git"
-pip install harmonize
+pip install harmonize-python
 ```
+
+To install from a clone of this repository instead, run
+`pip install ".[cuda13]"` (or `pip install .` for AMD) in it; add `-e` to
+work on Harmonize itself.
 
 
 ## Checking your setup

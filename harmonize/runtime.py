@@ -8,7 +8,7 @@ import numpy as np
 import cffi
 ffi = cffi.FFI()
 
-import harmonize.python.config as config
+import harmonize.config as config
 
 from os         import makedirs, getcwd, path
 from time       import sleep
