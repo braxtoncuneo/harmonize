@@ -1,0 +1,73 @@
+# =============================================================================
+# Tests
+# =============================================================================
+# Builds the sdist and wheel, installs the wheel, and runs the tests that need
+# no GPU, on the oldest and newest supported Python, one per CUDA extra.
+#
+# Only CUDA 13's pip packages include nvcc, so the C++ examples compile in the
+# CUDA 13 job; in the CUDA 12 job those tests skip. The GPU tests
+# (tests/test_programs.py) skip here; see tests/README.md.
+# =============================================================================
+
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }}, CUDA ${{ matrix.cuda }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python: "3.10"
+            cuda: "12"
+            pytest-options: ""
+          - python: "3.14"
+            cuda: "13"
+            pytest-options: --require nvcc
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Build the sdist and wheel
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+
+      # cuda-toolkit[nvcc] resolves together with Numba's CUDA packages, so
+      # nvcc and Numba's NVVM come from the same CUDA release and nvcc can
+      # assemble the PTX that NVVM emits.
+      - name: Install the wheel, CUDA ${{ matrix.cuda }}, and pytest
+        run: |
+          wheel=$(ls dist/*.whl)
+          python -m pip install "$wheel[cuda${{ matrix.cuda }}]" \
+            "cuda-toolkit[nvcc]==${{ matrix.cuda }}.*" pytest
+          nvcc=$(python -c 'import glob, nvidia; print(*glob.glob(nvidia.__path__[0] + "/*/bin/nvcc"))')
+          if [ -n "$nvcc" ]; then
+            dirname "$nvcc" >> "$GITHUB_PATH"
+          fi
+          python -m pip list
+
+      # `pytest`, not `python -m pytest`, so the tests import the installed
+      # wheel rather than the checkout (the report header shows which).
+      - name: Test
+        run: pytest -v ${{ matrix.pytest-options }} tests
