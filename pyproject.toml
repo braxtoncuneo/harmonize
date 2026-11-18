@@ -17,7 +17,7 @@ maintainers = [
     { name="Braxton Cuneo", email="bcuneo@seattleu.edu" },
 ]
 
-description = "Hamronize, an async GPU scheduler"
+description = "Harmonize, an async GPU scheduler"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {file = "LICENSE"}
