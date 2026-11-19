@@ -28,6 +28,9 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
+        with:
+          # Full history, to check that a release's commit is on main
+          fetch-depth: 0
 
       - uses: actions/setup-python@v7
         with:
@@ -47,6 +50,14 @@ jobs:
           version=$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
           if [ "$TAG" != "v$version" ]; then
             echo "::error::Release tag $TAG does not match the version in pyproject.toml (v$version)"
+            exit 1
+          fi
+
+      - name: Check that the release commit is on main
+        if: github.event_name == 'release'
+        run: |
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "::error::The release tag points to $(git rev-parse --short HEAD), which is not on main"
             exit 1
           fi
 
