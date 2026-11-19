@@ -22,3 +22,9 @@ def test_citation_version():
     match = re.search(r"^version:\s*['\"]?([^'\"\s]+)", read("CITATION.cff"), re.MULTILINE)
     assert match, "CITATION.cff has no version"
     assert match.group(1) == harmonize.__version__
+
+
+def test_changelog_has_version():
+    assert re.search(
+        rf"^## {re.escape(harmonize.__version__)}\b", read("CHANGELOG.md"), re.MULTILINE
+    ), f"CHANGELOG.md has no section for {harmonize.__version__}"
