@@ -38,3 +38,18 @@ python -m harmonize check
 By contributing, you agree that your contributions are licensed under the
 project's [BSD 3-Clause License](LICENSE). Everyone taking part is expected to
 follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Making a release
+
+For maintainers. The version is set in `pyproject.toml`; the tests check that
+`CITATION.cff` and `CHANGELOG.md` match it.
+
+1. In a pull request, set the new version in `pyproject.toml` and in
+   `CITATION.cff` (with `date-released`), and rename the changelog's
+   "Unreleased" section to the version and the release date. Merge it.
+2. Optionally, do a dry run: Actions -> Release -> Run workflow uploads the
+   build to [TestPyPI](https://test.pypi.org/p/harmonize-python).
+3. Create a GitHub release with a new tag `vX.Y.Z` on `main`, matching the
+   version, and the changelog section as its notes. Publishing it starts the
+   Release workflow, which builds the package, checks the tag against the
+   version, and uploads to PyPI.
