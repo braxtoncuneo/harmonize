@@ -5,12 +5,11 @@
 # PyPI. Running this workflow by hand uploads them to TestPyPI instead, as a
 # dry run. See CONTRIBUTING.md, "Making a release".
 #
-# Uploads use PyPI's trusted publishing, so no token is stored. One-time setup:
-#   - On pypi.org and test.pypi.org, add a trusted publisher for the project
-#     harmonize-python: owner harmonize-software, repository harmonize,
-#     workflow release.yml, environment pypi (PyPI) or testpypi (TestPyPI).
-#   - In this repository, create the environments pypi and testpypi
-#     (Settings -> Environments); add required reviewers to pypi if wanted.
+# Uploads use PyPI's trusted publishing, so no token is stored. PyPI trusts
+# this file by its name (release.yml) and by the environment names below
+# (pypi, testpypi): renaming any of them breaks uploads until PyPI's settings
+# are updated to match. CONTRIBUTING.md, "Release configuration", lists what is
+# configured outside this repository.
 # =============================================================================
 
 name: Release

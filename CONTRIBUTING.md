@@ -51,5 +51,21 @@ For maintainers. The version is set in `pyproject.toml`; the tests check that
    build to [TestPyPI](https://test.pypi.org/p/harmonize-python).
 3. Create a GitHub release with a new tag `vX.Y.Z` on `main`, matching the
    version, and the changelog section as its notes. Publishing it starts the
-   Release workflow, which builds the package, checks the tag against the
-   version, and uploads to PyPI.
+   Release workflow, which builds the package, checks that the tag matches the
+   version and points to a commit on `main`, and uploads to PyPI.
+
+### Release configuration
+
+Publishing depends on settings outside this repository. If releases fail with
+a publisher or environment error, or after moving or renaming the repository,
+the workflow, or an environment, check that these still match:
+
+- **PyPI and TestPyPI:** the `harmonize-python` project has a trusted publisher
+  for owner `harmonize-software`, repository `harmonize`, workflow
+  `release.yml`, and environment `pypi` (on pypi.org) or `testpypi` (on
+  test.pypi.org). No token is stored anywhere.
+- **Environments** (Settings -> Environments): `pypi` allows the tag pattern
+  `v*`, since a release runs on its tag rather than a branch, and may require a
+  reviewer's approval; `testpypi` allows only `main`.
+- **Tag ruleset** (Settings -> Rules): only maintainers may create, move, or
+  delete tags matching `v*`.
