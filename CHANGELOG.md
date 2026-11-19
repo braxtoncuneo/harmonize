@@ -3,7 +3,7 @@
 Notable changes to Harmonize. Versions follow [semantic versioning](https://semver.org/);
 before 1.0, a minor version (0.x.0) may include breaking changes.
 
-## Unreleased
+## 0.1.0 (2026-11-18)
 
 ### Changed (breaking)
 

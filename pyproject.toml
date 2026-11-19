@@ -10,7 +10,7 @@ build-backend = "hatchling.build"
 # The PyPI name "harmonize" belongs to an unrelated project; the import name is
 # still `harmonize`.
 name = "harmonize-python"
-version = "0.0.1"
+version = "0.1.0"
 authors = [
   { name="Braxton Cuneo", email="bcuneo@seattleu.edu" },
   { name="Joanna Morgan", email="morgajoa@oregonstate.edu" },
