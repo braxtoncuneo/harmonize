@@ -4,7 +4,13 @@ The names below are Harmonize's public Python API. The C++ headers are in the
 `cpp` directory of this package; see `get_include()`.
 """
 
+from importlib.metadata import PackageNotFoundError, version as _version
 from os.path import dirname, join
+
+try:
+    __version__ = _version("harmonize-python")
+except PackageNotFoundError:  # imported from a source tree that is not installed
+    __version__ = "unknown"
 
 import harmonize.config as config
 import harmonize.pointer as pointer
