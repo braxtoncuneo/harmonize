@@ -118,7 +118,7 @@ int main(int argc, char const* argv[]){
 	size_t wg_count = args["wg_count"];
 
 	unsigned int dev_idx  = args["dev_idx"] | 0;
-	cudaSetDevice(dev_idx);
+	adapt::GPUrtSetDevice(dev_idx);
 
 	unsigned int arena_size = args["pool"] | 0x800000;
 
@@ -144,7 +144,7 @@ int main(int argc, char const* argv[]){
 
 	counter.resize(1);
 	dev_state.counter = counter;
-	cudaMemset( counter, 0, sizeof(unsigned int) );
+	adapt::GPUrtMemset( counter, 0, sizeof(unsigned int) );
 
 	// Set the ID iterator to the range from zero to the number of source neutrons
 	source_id_iter<< iter::AtomicIter<unsigned int>(0,dev_state.dep_count+dev_state.non_dep_count);
@@ -162,7 +162,7 @@ int main(int argc, char const* argv[]){
 	dev_state.barrier = barrier;
 
 	// Synchronize for safety and report any errors
-	cudaDeviceSynchronize();
+	adapt::GPUrtDeviceSynchronize();
 	check_error();
 
 
@@ -174,11 +174,11 @@ int main(int argc, char const* argv[]){
 	ProgType::Instance instance(arena_size/32u,dev_state);
 
 	// Sync for safety and report any errors
-	cudaDeviceSynchronize();
+	adapt::GPUrtDeviceSynchronize();
 	check_error();
 
 	init<ProgType>(instance,wg_count);
-	cudaDeviceSynchronize();
+	adapt::GPUrtDeviceSynchronize();
 	check_error();
 	int num = 0;
 
@@ -187,7 +187,7 @@ int main(int argc, char const* argv[]){
 		// Give the number of work groups used and the number of iterations
 		// to perform before halting early, to prevent GPU timeouts
 		exec<ProgType>(instance,wg_count,0x1000000);
-		cudaDeviceSynchronize();
+		adapt::GPUrtDeviceSynchronize();
 		if( check_error() ) {
 			break;
 		}
