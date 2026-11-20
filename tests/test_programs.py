@@ -10,6 +10,8 @@ import sys
 
 import pytest
 
+from gpu_platform import platform
+
 PROGRAMS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "programs")
 
 
@@ -26,7 +28,9 @@ def run_program(name, *args, cwd):
 
 
 @pytest.mark.gpu
-@pytest.mark.nvcc
+@pytest.mark.compiler
 @pytest.mark.parametrize("mode", ["event", "async"])
 def test_collatz(mode, tmp_path):
+    if mode == "async" and platform() == "rocm":
+        pytest.skip("Harmonize supports only event mode on ROCm")
     assert f"collatz {mode}: OK" in run_program("collatz.py", mode, cwd=tmp_path)

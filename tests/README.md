@@ -8,15 +8,21 @@ pytest tests
 | Tests | Need | In CI |
 |---|---|---|
 | `test_package_layout.py`: package layout, deprecated `harmonize.python` names | nothing | every job |
-| `test_cpp_examples.py`: the C++ examples compile | nvcc | CUDA 13 job |
-| `test_programs.py`: small programs in `programs/` build, run, and give correct results in event and async modes | nvcc and a CUDA GPU | not yet (no GPU runners) |
+| `test_cpp_examples.py`: the C++ examples compile | nvcc or hipcc | CUDA 13 job |
+| `test_programs.py`: small programs in `programs/` build, run, and give correct results in event and async modes (event only on ROCm) | nvcc or hipcc, and a GPU | not yet (no GPU runners) |
+
+The tests run on the GPU platform Harmonize selects (CUDA or ROCm; set
+`HARMONIZE_PLATFORM` to choose), with its compiler: nvcc for CUDA, hipcc for
+ROCm. The pytest header shows which. Set `HARMONIZE_TEST_GPU_ARCH` to compile
+the C++ examples for another GPU (default: `80` on CUDA, hipcc's default on
+ROCm; e.g. `gfx942` for an MI300A).
 
 Tests skip when what they need is missing; the reason is printed with `-rs`.
-`--require nvcc` or `--require gpu` makes them fail instead, so a broken
+`--require compiler` or `--require gpu` makes them fail instead, so a broken
 environment cannot pass by skipping everything. To run the GPU tests:
 
 ```sh
-pytest --require nvcc --require gpu tests
+pytest --require compiler --require gpu tests
 ```
 
 nvcc must come from the same CUDA release as Numba's NVVM, and no newer than

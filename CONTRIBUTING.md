@@ -29,7 +29,7 @@ python -m harmonize check
   generator, or the C++ headers, also run the GPU tests and say so in the pull
   request:
   ```sh
-  pytest --require nvcc --require gpu tests
+  pytest --require compiler --require gpu tests
   ```
 - New public Python names go in `harmonize/__init__.py`'s `__all__`, with
   NumPy-style docstrings, and in `docs/python-api.md`. See

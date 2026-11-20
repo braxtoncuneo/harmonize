@@ -37,7 +37,7 @@ jobs:
             pytest-options: ""
           - python: "3.14"
             cuda: "13"
-            pytest-options: --require nvcc
+            pytest-options: --require compiler
 
     steps:
       - uses: actions/checkout@v7
