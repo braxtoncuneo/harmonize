@@ -53,12 +53,14 @@ def _missing(requirement):
 
 
 def pytest_runtest_setup(item):
-    for requirement in REQUIREMENTS:
-        if item.get_closest_marker(requirement) is None:
-            continue
-        reason = _missing(requirement)
-        if reason is None:
-            continue
-        if requirement in item.config.getoption("require"):
+    required = item.config.getoption("require")
+    missing = [
+        (requirement, _missing(requirement))
+        for requirement in REQUIREMENTS
+        if item.get_closest_marker(requirement) and _missing(requirement)
+    ]
+    for requirement, reason in missing:
+        if requirement in required:
             pytest.fail(f"{reason}, and --require {requirement} was given")
-        pytest.skip(reason)
+    if missing:
+        pytest.skip(missing[0][1])
