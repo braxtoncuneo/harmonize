@@ -1389,12 +1389,17 @@ def store_wrapper_{id}_obj_overload (vp,field):
                     load_state    = ext_fn(f"{load_name}_{suffix}",    sig(void, field.ext_kind, vp))
                     if field.is_array :
                         id = generate_uuid()
-                        exec(f"def store_pointer_wrapper_{id}(vp,field):\n    vptr = into_voidptr(field)\n    store_p_state(vp,vptr)",globals()|locals(),locals())
-                        exec(store_wrapper_template.format(id=id),globals()|locals(),locals())
-                        exec(load_wrapper_template.format(id=id),globals()|locals(),locals())
-                        store_state = eval(f"numba.njit()(store_wrapper_{id})")
-                        store_p_state = eval(f"numba.njit()(store_pointer_wrapper_{id})")
-                        load_state  = eval(f"numba.njit()(load_wrapper_{id})")
+                        # Define the wrappers in an explicit namespace: since
+                        # Python 3.13 (PEP 667), each locals() call returns a
+                        # new snapshot, so names that exec() defines in one are
+                        # not visible to a later eval().
+                        namespace = globals() | locals()
+                        exec(f"def store_pointer_wrapper_{id}(vp,field):\n    vptr = into_voidptr(field)\n    store_p_state(vp,vptr)",namespace)
+                        exec(store_wrapper_template.format(id=id),namespace)
+                        exec(load_wrapper_template.format(id=id),namespace)
+                        store_state = numba.njit()(namespace[f"store_wrapper_{id}"])
+                        store_p_state = numba.njit()(namespace[f"store_pointer_wrapper_{id}"])
+                        load_state  = numba.njit()(namespace[f"load_wrapper_{id}"])
 
                     spec.fn[kind][store_name]   = store_state
                     spec.fn[kind][store_p_name] = store_p_state

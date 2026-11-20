@@ -502,15 +502,21 @@ def cpu_memcpy_host_to_device_overload(dev_ptr,host_obj):
         else :
             size = host_obj.dtype.bitwidth / 8
         host_to_device   = ext_fn(f"harmonize_memcpy_host_to_device",   sig(void, vp, vp, uintp))
-        exec(host_to_device_array_template.format(name=name),globals()|locals(),locals())
-        impl = eval(name)
+        # An explicit namespace: since Python 3.13 (PEP 667), each locals()
+        # call is a new snapshot, which would not hold what exec() defines
+        namespace = globals() | locals()
+        exec(host_to_device_array_template.format(name=name),namespace)
+        impl = namespace[name]
     else :
         id = generate_uuid()
         name = f"memcpy_host_to_device_{id}"
         size = host_obj.size
         host_to_device   = ext_fn(f"harmonize_memcpy_host_to_device",   sig(void, vp, host_obj, uintp))
-        exec(host_to_device_object_template.format(name=name),globals()|locals(),locals())
-        impl = eval(name)
+        # An explicit namespace: since Python 3.13 (PEP 667), each locals()
+        # call is a new snapshot, which would not hold what exec() defines
+        namespace = globals() | locals()
+        exec(host_to_device_object_template.format(name=name),namespace)
+        impl = namespace[name]
     return impl
 
 @nb.extending.overload(memcpy_host_to_device_python,target='gpu')
@@ -560,15 +566,21 @@ def cpu_memcpy_device_to_host_overload(host_obj,dev_ptr):
         else :
             size = host_obj.dtype.bitwidth / 8
         device_to_host   = ext_fn(f"harmonize_memcpy_device_to_host",   sig(void, vp, vp, uintp))
-        exec(device_to_host_array_template.format(name=name),globals()|locals(),locals())
-        impl = eval(name)
+        # An explicit namespace: since Python 3.13 (PEP 667), each locals()
+        # call is a new snapshot, which would not hold what exec() defines
+        namespace = globals() | locals()
+        exec(device_to_host_array_template.format(name=name),namespace)
+        impl = namespace[name]
     else :
         id = generate_uuid()
         name = f"memcpy_device_to_host_{id}"
         device_to_host   = ext_fn(f"harmonize_memcpy_device_to_host",   sig(void, host_obj, vp, uintp))
         size = host_obj.size
-        exec(device_to_host_object_template.format(name=name),globals()|locals(),locals())
-        impl = eval(name)
+        # An explicit namespace: since Python 3.13 (PEP 667), each locals()
+        # call is a new snapshot, which would not hold what exec() defines
+        namespace = globals() | locals()
+        exec(device_to_host_object_template.format(name=name),namespace)
+        impl = namespace[name]
     return impl
 
 @nb.extending.overload(memcpy_device_to_host_python,target='gpu')
