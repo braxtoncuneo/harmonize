@@ -29,8 +29,10 @@ def run_program(name, *args, cwd):
 
 @pytest.mark.gpu
 @pytest.mark.compiler
+@pytest.mark.parametrize("layout", ["record", "array"])
 @pytest.mark.parametrize("mode", ["event", "async"])
-def test_collatz(mode, tmp_path):
+def test_collatz(mode, layout, tmp_path):
     if mode == "async" and platform() == "rocm":
         pytest.skip("Harmonize supports only event mode on ROCm")
-    assert f"collatz {mode}: OK" in run_program("collatz.py", mode, cwd=tmp_path)
+    output = run_program("collatz.py", mode, layout, cwd=tmp_path)
+    assert f"collatz {mode} {layout}: OK" in output

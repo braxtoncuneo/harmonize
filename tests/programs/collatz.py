@@ -1,10 +1,16 @@
 """A small Harmonize program that counts Collatz steps on the GPU.
 
-    python collatz.py {event,async}
+    python collatz.py {event,async} [record|array]
 
 Builds the program, runs it in the given mode, and checks every result against
 a CPU reference. Run it in an empty directory: Harmonize writes its build cache
 to __harmonize_cache__/ in the working directory.
+
+The layout chooses how the device state is given to Harmonize:
+  record  a record, copied in and out with store_state and load_state
+  array   a field holding a one-element array of that record, in device
+          memory the program allocates and copies; MC/DC's GPU state works
+          this way
 
 Numba must see the functions below as module-level Python functions, so the
 program lives in its own file and the tests run it in a subprocess.
@@ -19,7 +25,8 @@ from numba import njit
 import harmonize as harm
 
 MODE = sys.argv[1]
-assert MODE in ("event", "async"), sys.argv
+LAYOUT = sys.argv[2] if len(sys.argv) > 2 else "record"
+assert MODE in ("event", "async") and LAYOUT in ("record", "array"), sys.argv
 
 VALUE_COUNT = 4096
 STEPS_PER_MAKE_WORK = 4
@@ -29,7 +36,11 @@ dev_state_type = numba.from_dtype(
 )
 grp_state_type = numba.from_dtype(np.dtype([]))
 thd_state_type = numba.from_dtype(np.dtype([]))
-state_spec = (dev_state_type, grp_state_type, thd_state_type)
+if LAYOUT == "record":
+    state_spec = (dev_state_type, grp_state_type, thd_state_type)
+else:
+    counts_type = numba.types.Array(dev_state_type, 1, "C")
+    state_spec = ({"counts": counts_type}, grp_state_type, thd_state_type)
 
 iter_type = numba.from_dtype(
     np.dtype([("value", np.int64), ("start", np.int64), ("steps", np.int64)])
@@ -87,7 +98,11 @@ def make_work(prog: numba.uintp) -> numba.boolean:
 
 
 access = harm.RuntimeSpec.access_fns(state_spec)
-device = access["device"]
+# Either way, device(prog) is the record
+if LAYOUT == "record":
+    device = access["device"]
+else:
+    device = access["device"]["counts"]["indirect"]
 odd_async, even_async = harm.RuntimeSpec.async_dispatch(odd, even)
 
 spec = harm.RuntimeSpec(
@@ -101,8 +116,11 @@ alloc_state = fns["alloc_state"]
 free_state = fns["free_state"]
 alloc_program = fns["alloc_program"]
 free_program = fns["free_program"]
-store_state = fns["store_state_device"]
-load_state = fns["load_state_device"]
+if LAYOUT == "record":
+    store_state = fns["store_state_device"]
+    load_state = fns["load_state_device"]
+else:
+    store_pointer = fns["store_pointer_state_device_counts"]
 init_program = fns["init_program"]
 exec_program = fns["exec_program"]
 complete = fns["complete"]
@@ -115,17 +133,34 @@ EXEC_CHUNK = 1 if MODE == "event" else 0x10000
 
 
 @njit
-def run_on_gpu(state):
-    gpu_state = alloc_state()
+def run_program(gpu_state):
     program = alloc_program(gpu_state, PROGRAM_SIZE)
-    store_state(gpu_state, state)
     init_program(program, GRID_SIZE)
     exec_program(program, GRID_SIZE, EXEC_CHUNK)
     while not complete(program):
         exec_program(program, GRID_SIZE, EXEC_CHUNK)
-    load_state(state, gpu_state)
     free_program(program)
+
+
+@njit
+def run_with_record(states):
+    gpu_state = alloc_state()
+    store_state(gpu_state, states[0])
+    run_program(gpu_state)
+    load_state(states[0], gpu_state)
     free_state(gpu_state)
+
+
+@njit
+def run_with_array(states):
+    counts = harm.alloc_device_bytes(states.nbytes)
+    harm.memcpy_host_to_device(counts, states)
+    gpu_state = alloc_state()
+    store_pointer(gpu_state, harm.pointer.cast_voidptr_to_uintp(counts))
+    run_program(gpu_state)
+    harm.memcpy_device_to_host(states, counts)
+    free_state(gpu_state)
+    harm.free_device_bytes(counts)
 
 
 @njit
@@ -141,7 +176,10 @@ def reference_steps(value):
 
 
 state = np.zeros((1,), dev_state_type)
-run_on_gpu(state[0])
+if LAYOUT == "record":
+    run_with_record(state)
+else:
+    run_with_array(state)
 wrong = [
     value
     for value in range(VALUE_COUNT)
@@ -149,4 +187,4 @@ wrong = [
 ]
 if wrong:
     sys.exit(f"{len(wrong)} of {VALUE_COUNT} results are wrong, first at {wrong[:5]}")
-print(f"collatz {MODE}: OK")
+print(f"collatz {MODE} {LAYOUT}: OK")
